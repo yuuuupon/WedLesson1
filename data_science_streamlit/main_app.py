@@ -1,41 +1,36 @@
 import streamlit as st
 import pandas as pd
-
-#"st.set_page_config()
-
-df = pd.read_csv('country_covid_status.csv')
-df_covid = pd.read_csv('covid_data.csv')
-
-df = df.rename(
-    columns={'New_cases':'感染者数', 'New_deaths':'死亡者数',
-    'population':'人口', 'deaths_by_cases':'死亡率', 'gdp_per_capita':'一人あたりのGDP（USドル）'})
-
-df_covid = df_covid.rename(
-    columns={'Date_reported':'日付', 'New_cases':'感染者数', 'New_deaths':'死亡者数'})
-
-st.header('コロナによる影響')
-# 国を選択
-option = st.selectbox(
-    '国の選択',
-     df['Country'])
-
-st.write(df[df['Country']==option][['人口','感染者数', '死亡者数', '死亡率', '一人あたりのGDP（USドル）']])
-st.text('※感染者数と死亡者数は2023年4月13日時点の累計\n※人口は2021年のデータ')
-
-
 import matplotlib.pyplot as plt
-def plot_new_covid_cases_and_deaths_by_country(df, country):
 
-    df_c = df[df['Country']==country]
+st.header('コロナ　影響')
 
-    df_c['日付'] = pd.to_datetime(df_c['日付'])
+df = pd.read_csv('/content/drive/MyDrive/水1-2/2/data_science_streamlit/country_covid_status.csv')
+df = df.rename(
+ columns={'New_cases':'感染者数', 'New_deaths': '死亡者数', 'population':'人口',
+          'deaths_by_cases':'死亡率', 'gdp_per_capita':'一人当たりのGDP'})
 
-    fig, ax = plt.subplots(2, figsize=(20, 8))
-    ax[0].plot(df_c['日付'], df_c['感染者数'])
-    ax[1].plot(df_c['日付'], df_c['死亡者数'], color='orange')
-    return fig
+option = st.selectbox('国の選択', df['Country'])
+st.write(option, 'を選びました')
 
+st.write(df[df['Country'] == option][['人口', '感染者数', '死亡者数', '死亡率', '一人当たりのGDP']])
 
-st.write(plot_new_covid_cases_and_deaths_by_country(df_covid[df_covid['Country']==option], option))
+df_covid = pd.read_csv('/content/drive/MyDrive/水1-2/2/data_science_streamlit/covid_data.csv')
 
-st.write(df_covid[df_covid['Country']==option][['日付', '感染者数', '死亡者数']])
+#st.write(df_covid[df_covid['Country'] == option])
+
+def CovidPlot(df, country):
+
+  #datatimeに変換
+  df['Date_reported'] = pd.to_datetime(df['Date_reported'])
+
+  #指定した国に絞る
+  df_2 = df[df['Country'] == country]
+
+  fig, ax = plt.subplots(2, figsize = (10, 10))
+  ax[0].plot(df_2['Date_reported'], df_2['New_cases'], color='lightseagreen')
+  ax[1].plot(df_2['Date_reported'], df_2['New_deaths'], color='violet')
+  #plt.show()
+
+  return fig
+
+st.write(CovidPlot(df_covid, option))
